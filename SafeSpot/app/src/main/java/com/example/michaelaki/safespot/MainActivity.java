@@ -20,6 +20,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,6 +36,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View.OnClickListener;
 
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
 import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends Activity implements OnItemClickListener, OnClickListener {
@@ -46,21 +51,22 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     private static final String OUT_JSON = "/json";
     private static final String API_KEY = "AIzaSyAtonyO8kbRMgzGLhGWR0O7Zb513qzBmGQ";
     private static final String CRIME_PULL_API_BASE = "http://www.app-lighthouse.com/app/crimepullcirc.php";
-    private static final String SERVER_NAME = "localhost";
-    private static final String USER_NAME = "applight_LHUser";
-    private static final String PASSWORD = "mikelikesbirds1!";
-    private static final String DATABASE_NAME = "applight_lighthouse";
     private static ArrayList<ArrayList<String>> resultList;
     private AutoCompleteTextView autoCompView;
     private String id;
     private static ArrayList<String> latlong = new ArrayList();
     private double latitude,longitude;
+    //TODO make a dropdown instead of checkbox
     private CheckBox check2014,check2015, check2016;
     private static int year;
     private boolean done = false;
     private double danger;
-    private int [] crimes;
+    private ArrayList<Crime> crimeCollection = new ArrayList();
     private static double radius;
+    private MapView mapView;
+
+    //TODO make settings store years and radius
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +79,9 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
         check2016 = (CheckBox) findViewById(R.id.checkBox3);
         autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
         autoCompView.setOnItemClickListener(this);
+
     }
+
 
     public void onItemClick(AdapterView adapterView, View view, int position, long id) {
         String str = (String) adapterView.getItemAtPosition(position);
@@ -107,6 +115,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             thread.start();
             while (latlong.size() < 2) {
 
+
             }
 
             latitude = Double.parseDouble(latlong.get(0));
@@ -126,23 +135,12 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
 
             thread1.start();
 
+            //TODO convert to an on completion
             while (!done) {
 
             }
             setContentView(R.layout.scores);
-            TextView dangerScore = (TextView) findViewById(R.id.textView2);
-            TextView crimeText = (TextView) findViewById(R.id.textView5);
-            TextView details = (TextView) findViewById(R.id.textView6);
             DecimalFormat df = new DecimalFormat("####0.00");
-            dangerScore.setText("Danger Score\n" + df.format(danger));
-            dangerScore.setTextColor(Color.rgb((int) danger * 50, 0, 0));
-            details.setText("Crimes for " + autoCompView.getText());
-            crimeText.setText("Homicides: " + crimes[0] + "\nAggregated Assault: " + crimes[1]
-                    + "\nRape: " + crimes[2] + "\nPedestrian Robbery: " + crimes[3]
-                    + "\nResidential Robbery: " + crimes[5] + "\nNon Vehicular Larceny: "
-                    + crimes[6] + "\nResidential Burglary: " + crimes[7] + "\nCommercial Robbery: "
-                    + crimes[8] + "\nAuto Theft: " + crimes[9] + "\nNon-Residential Burglary: "
-                    + crimes[10] + "\nVehicular Larceny: " + crimes[11]);
         }
     }
 
@@ -156,6 +154,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
         String urlParameters = "curlatitude=" + latitude
                 + "&curlongitude=" + longitude + "&radius=" + latlongRadius + "&year=" + year;
         con.setDoOutput(true);
+        //TODO add error handling for incorrect response
+        //TODO making single response buffer
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
         wr.writeBytes(urlParameters);
         wr.flush();
@@ -178,96 +178,69 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
         }
 
         JSONObject dataPoints = new JSONObject(response.toString());
-        crimes = new int[12];
-        danger = 0.0;
-        boolean finish = false;
         for (int k = 0; k < Integer.parseInt(dataPoints.getString("result_num")); k++) {
-            if (finish) {
-                String crimeType = dataPoints.getJSONObject(Integer.toString(k)).getString("typeCrime");
-                if (crimeType.equals("HOMICIDE")) {
-                    danger += 1.0;
-                    crimes[0]++;
-                } else if (crimeType.equals("AGG ASSAULT")) {
-                    danger += 1.0;
-                    crimes[1]++;
-                } else if (crimeType.equals("RAPE")) {
-                    danger += 1.0;
-                    crimes[2]++;
-                } else if (crimeType.equals("ROBBERY-PEDESTRIAN")) {
-                    danger += 1.0;
-                    crimes[3]++;
-                } else if (crimeType.equals("ROBBERY-RESIDENTIAL")) {
-                    danger += 1.0;
-                    crimes[5]++;
-                } else if (crimeType.equals("LARCENY-NON VEHICLE")) {
-                    danger += .5;
-                    crimes[6]++;
-                } else if (crimeType.equals("BURGLARY-RESIDENCE")) {
-                    danger += .5;
-                    crimes[7]++;
-                } else if (crimeType.equals("ROBBERY-COMMERCIAL")) {
-                    danger += .25;
-                    crimes[8]++;
-                } else if (crimeType.equals("AUTO THEFT")) {
-                    danger += .25;
-                    crimes[9]++;
-                } else if (crimeType.equals("BURGLARY-NONRES")) {
-                    danger += .05;
-                    crimes[10]++;
-                } else if (crimeType.equals("LARCENY-FROM VEHICLE")) {
-                    danger += .05;
-                    crimes[11]++;
-                }
-            } else {
-                String date = dataPoints.getJSONObject(Integer.toString(k)).getString("date");
-                if (Integer.parseInt(date.substring(0, 4)) >= year) {
-                    String crimeType = dataPoints.getJSONObject(Integer.toString(k)).getString("typeCrime");
-                    if (crimeType.equals("HOMICIDE")) {
-                        danger += 1.0;
-                        crimes[0]++;
-                    } else if (crimeType.equals("AGG ASSAULT")) {
-                        danger += 1.0;
-                        crimes[1]++;
-                    } else if (crimeType.equals("RAPE")) {
-                        danger += 1.0;
-                        crimes[2]++;
-                    } else if (crimeType.equals("ROBBERY-PEDESTRIAN")) {
-                        danger += 1.0;
-                        crimes[3]++;
-                    } else if (crimeType.equals("ROBBERY-RESIDENTIAL")) {
-                        danger += 1.0;
-                        crimes[5]++;
-                    } else if (crimeType.equals("LARCENY-NON VEHICLE")) {
-                        danger += .5;
-                        crimes[6]++;
-                    } else if (crimeType.equals("BURGLARY-RESIDENCE")) {
-                        danger += .5;
-                        crimes[7]++;
-                    } else if (crimeType.equals("ROBBERY-COMMERCIAL")) {
-                        danger += .25;
-                        crimes[8]++;
-                    } else if (crimeType.equals("AUTO THEFT")) {
-                        danger += .25;
-                        crimes[9]++;
-                    } else if (crimeType.equals("BURGLARY-NONRES")) {
-                        danger += .05;
-                        crimes[10]++;
-                    } else if (crimeType.equals("LARCENY-FROM VEHICLE")) {
-                        danger += .05;
-                        crimes[11]++;
-                    }
-                    finish = true;
-                }
+            JSONObject currentCrime = dataPoints.getJSONObject(Integer.toString(k));
+            String id = currentCrime.getString("id");
+
+            if (!containsId(crimeCollection, id)) {
+                String date = currentCrime.getString("date");
+                String typeCrime = currentCrime.getString("typeCrime");
+                double lat = currentCrime.getDouble("lat");
+                double lon = currentCrime.getDouble("long");
+                Crime crimeObject = new Crime(id, date, typeCrime, lat, lon);
+                crimeCollection.add(crimeObject);
             }
         }
-        if (year == 2014) {
-            danger /= 6;
-        } else if (year == 2015) {
-            danger /= 4;
-        }
-        danger /= (radius * 60);
-        done = true;
+        danger = calculateDanger(crimeCollection);
+        System.out.println(danger);
     }
+
+    public double calculateDanger(ArrayList<Crime> crimes) {
+        double dangerLevel = 0;
+        for(Crime exampleCrime:crimes) {
+            String currentTypeCrime = exampleCrime.getTypeCrime();
+            String currentDate = exampleCrime.getDate();
+            double currentDangerLevel = 0;
+            if (currentTypeCrime.equals("HOMICIDE")) {
+                currentDangerLevel = 1.0;
+            } else if (currentTypeCrime.equals("AGG ASSAULT")) {
+                currentDangerLevel = 1.0;
+            } else if (currentTypeCrime.equals("RAPE")) {
+                currentDangerLevel = 1.0;
+            } else if (currentTypeCrime.equals("ROBBERY-PEDESTRIAN")) {
+                currentDangerLevel = 1.0;
+            } else if (currentTypeCrime.equals("ROBBERY-RESIDENCE")) {
+                currentDangerLevel = 1.0;
+            } else if (currentTypeCrime.equals("BURGLARY-RESIDENCE")) {
+                currentDangerLevel = 0.5;
+            } else if (currentTypeCrime.equals("LARCENY-NON VEHICLE")) {
+                currentDangerLevel = 0.5;
+            } else if (currentTypeCrime.equals("AUTO THEFT")) {
+                currentDangerLevel = 0.25;
+            } else if (currentTypeCrime.equals("ROBBERY-COMMERICAL")) {
+                currentDangerLevel = 0.25;
+            } else if (currentTypeCrime.equals("BURGLARY-NONRES")) {
+                currentDangerLevel = 0.25;
+            } else if (currentTypeCrime.equals("LARCENY-FROM VEHICLE")) {
+                currentDangerLevel = 0.25;
+            }
+
+            String currentYear = currentDate.substring(0,3);
+            if (currentYear.equals("2014")) {
+                currentDangerLevel /= 4;
+            } else if (currentYear.equals("2015")) {
+                currentDangerLevel /= 3;
+            } else if (currentYear.equals("2016")) {
+                currentDangerLevel /= 2;
+            }
+
+            dangerLevel += currentDangerLevel;
+        }
+        return dangerLevel;
+
+    }
+
+
 
     public static void search(String input) {
         HttpURLConnection conn = null;
@@ -405,5 +378,14 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             };
             return filter;
         }
+    }
+
+    public static boolean containsId(ArrayList<Crime> list, String id) {
+        for (Crime object : list) {
+            if (object.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
