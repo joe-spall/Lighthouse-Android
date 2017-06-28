@@ -57,7 +57,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     private static ArrayList<String> latlong = new ArrayList();
     private double latitude,longitude;
     //TODO make a dropdown instead of checkbox
-    private CheckBox check2014,check2015, check2016;
     private static int year;
     private boolean done = false;
     private double danger;
@@ -72,11 +71,9 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-        Button start = (Button) findViewById(R.id.button);
-        start.setOnClickListener(this);
-        check2015 = (CheckBox) findViewById(R.id.checkBox);
-        check2014 = (CheckBox) findViewById(R.id.checkBox2);
-        check2016 = (CheckBox) findViewById(R.id.checkBox3);
+        Button settings = (Button) findViewById(R.id.settings);
+        settings.setOnClickListener(this);
+
         autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
         autoCompView.setOnItemClickListener(this);
 
@@ -91,14 +88,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.button) {
-            if (check2014.isChecked()) {
-                year = 2014;
-            } else if (check2015.isChecked()) {
-                year = 2015;
-            } else {
-                year = 2016;
-            }
+
+
+
+        if (v.getId() == R.id.settings) {
+            setContentView(R.layout.preferences);
+
+         /*
             EditText radiusFinder = (EditText) findViewById(R.id.editText);
             radius = Double.parseDouble(radiusFinder.getText().toString());
             Thread thread = new Thread(new Runnable() {
@@ -141,6 +137,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             }
             setContentView(R.layout.scores);
             DecimalFormat df = new DecimalFormat("####0.00");
+            */
         }
     }
 

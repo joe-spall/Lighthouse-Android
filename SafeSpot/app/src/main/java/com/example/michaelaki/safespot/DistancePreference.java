@@ -1,15 +1,13 @@
 package com.example.michaelaki.safespot;
 
-import android.os.Build;
-import android.os.Bundle;
+
 import android.preference.DialogPreference;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.content.res.TypedArray;
 
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.TextView;
-import android.widget.Toast;
+
+
 
 
 /**
@@ -18,59 +16,86 @@ import android.widget.Toast;
 
 public class DistancePreference extends DialogPreference {
 
-    private SeekBar seekBar;
-    private TextView textView;
+    /**
+     * Radius value
+     */
+    private float radius;
 
-    //Distance Preference Methods
+    /**
+     * Resource of the dialog layout
+     */
+    private int mDialogLayoutResId = R.layout.distance_pref;
+
+    public DistancePreference(Context context){
+        this(context,null);
+    }
 
     public DistancePreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
+        // Delegate to other constructor
+        // Use the preferenceStyle as the default style
+        this(context, attrs, 0);
     }
 
+    public DistancePreference(Context context, AttributeSet attrs, int defStyleAttr) {
+        // Delegate to other constructor
+        this(context, attrs, defStyleAttr, defStyleAttr);
+    }
+
+    public DistancePreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        // Du custom stuff here
+        // ...
+        // read attributes etc.
+    }
+
+    /**
+     * Gets the radius from the Shared Preferences
+     *
+     * @return The current preference value
+     */
+    public float getDistance() {
+        return radius;
+    }
+
+    /**
+     * Saves the time to the SharedPreferences
+     *
+     * @param distance The radius distance to save
+     */
+    public void setDistance(float distance) {
+        radius = distance;
+
+        // Save to SharedPreference
+        persistFloat(distance);
+    }
+
+    /**
+     * Called when a Preference is being inflated and the default value attribute needs to be read
+     */
     @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        // When the user selects "OK", persist the new value
-        if (positiveResult) {
-            persistInt(mNewValue);
-        }
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        // The type of this preference is Float, so we read the default value from the attributes
+        // as Float. Fallback value is set to 0.
+        return a.getFloat(index, 0.05f);
     }
 
-    //Seek Bar Methods
-
+    /**
+     * Returns the layout resource that is used as the content View for the dialog
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        initializeVariables();
-
-        // Initialize the textview with '0'.
-        textView.setText("Covered: " + seekBar.getProgress() + "/" + seekBar.getMax());
-
-        seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-            int progress = 0;
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
-                progress = progressValue;
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                textView.setText("Covered: " + progress + "/" + seekBar.getMax());
-            }
-        });
+    public int getDialogLayoutResource() {
+        return mDialogLayoutResId;
     }
 
-    // A private method to help us initialize our variables.
-    private void initializeVariables() {
-        seekBar = (SeekBar) findViewById(R.id.seekBar1);
-        textView = (TextView) findViewById(R.id.textView1);
+    /**
+     * Implement this to set the initial value of the Preference.
+     */
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        // If the value can be restored, do it. If not, use the default value.
+        setDistance(restorePersistedValue ?
+                getPersistedFloat(radius) : (float) defaultValue);
     }
 
 }
