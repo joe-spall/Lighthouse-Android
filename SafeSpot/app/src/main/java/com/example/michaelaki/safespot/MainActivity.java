@@ -9,19 +9,47 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.*;
+import com.android.volley.Response;
+import com.android.volley.Network;
+import com.android.volley.NetworkError;
+import com.android.volley.NetworkResponse;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationSource;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -31,6 +59,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View.OnClickListener;
@@ -61,38 +92,231 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     private double danger;
     private int [] crimes;
     private static double radius;
+    private MapView mapView;
+    private Settings settings;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Mapbox.getInstance(this, getString(R.string.access_token));
+        //creates instance of mapbox
+
         setContentView(R.layout.activity_main);
+
         autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
-        Button start = (Button) findViewById(R.id.button);
-        start.setOnClickListener(this);
-        check2015 = (CheckBox) findViewById(R.id.checkBox);
-        check2014 = (CheckBox) findViewById(R.id.checkBox2);
-        check2016 = (CheckBox) findViewById(R.id.checkBox3);
+        ImageButton currentLocation = (ImageButton) findViewById(R.id.currentLocation);
+        currentLocation.setOnClickListener(this);
+        ImageButton settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(this);
         autoCompView.setAdapter(new GooglePlacesAutocompleteAdapter(this, R.layout.list_item));
         autoCompView.setOnItemClickListener(this);
+        mapView = (MapView) findViewById(R.id.mapview);
+        //gets elements on screen and sets up click listeners
+
+        if (settings == null) {
+            settings = new Settings();
+        }
+        Intent intent = getIntent();
+        if (intent.getStringExtra("MapType") != null) {
+            settings.setYear(intent.getIntExtra("Year", 2014));
+            settings.setMapType(intent.getStringExtra("MapType"));
+        }
+
+
+        mapView.onCreate(savedInstanceState);
+        mapView.setStyleUrl(settings.getMapType());
+
+        final LocationSource locationSource = new LocationSource(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Check Permissions Now
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    2);
+        } else {
+            // If permissions have already been given
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(MapboxMap mapboxMap) {
+                    mapboxMap.setMyLocationEnabled(true);
+                    Location location = null;
+                    locationSource.activate();
+                    try {
+                        location = locationSource.getLastLocation();
+                    } catch (SecurityException e) {
+                        Log.e("Not given permission", "Request Permission from the user"); // lets the user know there is a problem with the gps
+                    }
+                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(location.getLatitude(), location.getLongitude())) // Sets the center of the map to Chicago
+                            .zoom(11)                            // Sets the zoom
+                            .build();
+                    mapboxMap.setCameraPosition(cameraPosition);
+                    // Interact with the map using mapboxMap here
+
+                }
+            });
+        }
+
+
+
+    }
+
+    public void updateLocation() {
+        final LocationSource locationSource = new LocationSource(this);
+        // We can now safely use the API we requested access to
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                mapboxMap.setMyLocationEnabled(true);
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(latitude, longitude))
+                        .zoom(16)                            // Sets the zoom
+                        .build();
+                mapboxMap.setCameraPosition(cameraPosition);
+                // Interact with the map using mapboxMap here
+
+            }
+        });
+    }
+
+
+    /*
+        Runs if the Location Permissions have been granted upon request
+    */
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode == 2) {
+            if(grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                final LocationSource locationSource = new LocationSource(this);
+                // We can now safely use the API we requested access to
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap mapboxMap) {
+                        mapboxMap.setMyLocationEnabled(true);
+                        Location location = null;
+                        try {
+                            location = locationSource.getLastLocation();
+                        } catch (SecurityException e) {
+                            Log.e("Not given permission", "Request Permission from the user"); // lets the user know there is a problem with the gps
+                        }
+                        final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(location.getLatitude(), location.getLongitude())) // Sets the center of the map to current location
+                                .zoom(11)                            // Sets the zoom
+                                .build();
+                        mapboxMap.setCameraPosition(cameraPosition);
+                        // Interact with the map using mapboxMap here
+
+                    }
+                });
+
+            } else {
+                // Permission was denied or request was cancelled
+            }
+        }
     }
 
     public void onItemClick(AdapterView adapterView, View view, int position, long id) {
+
         String str = (String) adapterView.getItemAtPosition(position);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
         this.id = resultList.get(1).get(position);
+        View view2 = this.getCurrentFocus();
+        if (view2 != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+        search(this.id);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.button) {
-            if (check2014.isChecked()) {
-                year = 2014;
-            } else if (check2015.isChecked()) {
-                year = 2015;
-            } else {
-                year = 2016;
-            }
-            EditText radiusFinder = (EditText) findViewById(R.id.editText);
-            radius = Double.parseDouble(radiusFinder.getText().toString());
+//        if (v.getId() == R.id.button) {
+//            if (check2014.isChecked()) {
+//                year = 2014;
+//            } else if (check2015.isChecked()) {
+//                year = 2015;
+//            } else {
+//                year = 2016;
+//            }
+//            EditText radiusFinder = (EditText) findViewById(R.id.editText);
+//            radius = Double.parseDouble(radiusFinder.getText().toString());
+        if (v.getId() == R.id.currentLocation) {
+            final LocationSource locationSource = new LocationSource(this);
+            // We can now safely use the API we requested access to
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(MapboxMap mapboxMap) {
+                    mapboxMap.setMyLocationEnabled(true);
+                    Location location = null;
+
+                    try {
+
+                        location = locationSource.getLastLocation();
+                    } catch (SecurityException e) {
+                        Log.e("Not given permission", "Request Permission from the user"); // lets the user know there is a problem with the gps
+                    }
+                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(location.getLatitude(), location.getLongitude())) // Sets the center of the map to Chicago
+                            .zoom(15)                            // Sets the zoom
+                            .build();
+                    mapboxMap.setCameraPosition(cameraPosition);
+                    // Interact with the map using mapboxMap here
+
+                }
+            });
+        } else if (v.getId() == R.id.settingsButton) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+
+        } else if (v.getId() == R.id.cancelButton) {
+            setContentView(R.layout.activity_main);
+            updateLocation();
+        } else {
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -105,9 +329,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             });
 
             thread.start();
-            while (latlong.size() < 2) {
-
-            }
 
             latitude = Double.parseDouble(latlong.get(0));
             longitude = Double.parseDouble(latlong.get(1));
@@ -144,83 +365,42 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
                     + crimes[8] + "\nAuto Theft: " + crimes[9] + "\nNon-Residential Burglary: "
                     + crimes[10] + "\nVehicular Larceny: " + crimes[11]);
         }
+
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void findCrime(double latitude, double longitude) throws Exception {
         String url = CRIME_PULL_API_BASE;
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("POST");
         double latlongRadius = radius / 69.0;
         String urlParameters = "curlatitude=" + latitude
                 + "&curlongitude=" + longitude + "&radius=" + latlongRadius + "&year=" + year;
-        con.setDoOutput(true);
-        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-        wr.writeBytes(urlParameters);
-        wr.flush();
-        wr.close();
-        int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'POST' request to URL : " + url);
-        System.out.println("Post parameters : " + urlParameters);
-        System.out.println("Response Code : " + responseCode);
+        JsonObjectRequest request = new JsonObjectRequest(url+urlParameters, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        calculateDanger(response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        int read;
-        char[] buff = new char[1024];
-        while ((read = in.read(buff)) != -1) {
-            response.append(buff, 0, read);
-        }
-        in.close();
-        if (con != null) {
-            con.disconnect();
-        }
-
-        JSONObject dataPoints = new JSONObject(response.toString());
-        crimes = new int[12];
-        danger = 0.0;
-        boolean finish = false;
-        for (int k = 0; k < Integer.parseInt(dataPoints.getString("result_num")); k++) {
-            if (finish) {
-                String crimeType = dataPoints.getJSONObject(Integer.toString(k)).getString("typeCrime");
-                if (crimeType.equals("HOMICIDE")) {
-                    danger += 1.0;
-                    crimes[0]++;
-                } else if (crimeType.equals("AGG ASSAULT")) {
-                    danger += 1.0;
-                    crimes[1]++;
-                } else if (crimeType.equals("RAPE")) {
-                    danger += 1.0;
-                    crimes[2]++;
-                } else if (crimeType.equals("ROBBERY-PEDESTRIAN")) {
-                    danger += 1.0;
-                    crimes[3]++;
-                } else if (crimeType.equals("ROBBERY-RESIDENTIAL")) {
-                    danger += 1.0;
-                    crimes[5]++;
-                } else if (crimeType.equals("LARCENY-NON VEHICLE")) {
-                    danger += .5;
-                    crimes[6]++;
-                } else if (crimeType.equals("BURGLARY-RESIDENCE")) {
-                    danger += .5;
-                    crimes[7]++;
-                } else if (crimeType.equals("ROBBERY-COMMERCIAL")) {
-                    danger += .25;
-                    crimes[8]++;
-                } else if (crimeType.equals("AUTO THEFT")) {
-                    danger += .25;
-                    crimes[9]++;
-                } else if (crimeType.equals("BURGLARY-NONRES")) {
-                    danger += .05;
-                    crimes[10]++;
-                } else if (crimeType.equals("LARCENY-FROM VEHICLE")) {
-                    danger += .05;
-                    crimes[11]++;
+                    }
                 }
-            } else {
-                String date = dataPoints.getJSONObject(Integer.toString(k)).getString("date");
-                if (Integer.parseInt(date.substring(0, 4)) >= year) {
+                );
+
+
+
+
+    }
+
+    public void calculateDanger(JSONObject response) {
+        try {
+            JSONObject dataPoints = new JSONObject(response.toString());
+            crimes = new int[12];
+            danger = 0.0;
+            boolean finish = false;
+            for (int k = 0; k < Integer.parseInt(dataPoints.getString("result_num")); k++) {
+                if (finish) {
                     String crimeType = dataPoints.getJSONObject(Integer.toString(k)).getString("typeCrime");
                     if (crimeType.equals("HOMICIDE")) {
                         danger += 1.0;
@@ -256,20 +436,61 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
                         danger += .05;
                         crimes[11]++;
                     }
-                    finish = true;
+                } else {
+                    String date = dataPoints.getJSONObject(Integer.toString(k)).getString("date");
+                    if (Integer.parseInt(date.substring(0, 4)) >= year) {
+                        String crimeType = dataPoints.getJSONObject(Integer.toString(k)).getString("typeCrime");
+                        if (crimeType.equals("HOMICIDE")) {
+                            danger += 1.0;
+                            crimes[0]++;
+                        } else if (crimeType.equals("AGG ASSAULT")) {
+                            danger += 1.0;
+                            crimes[1]++;
+                        } else if (crimeType.equals("RAPE")) {
+                            danger += 1.0;
+                            crimes[2]++;
+                        } else if (crimeType.equals("ROBBERY-PEDESTRIAN")) {
+                            danger += 1.0;
+                            crimes[3]++;
+                        } else if (crimeType.equals("ROBBERY-RESIDENTIAL")) {
+                            danger += 1.0;
+                            crimes[5]++;
+                        } else if (crimeType.equals("LARCENY-NON VEHICLE")) {
+                            danger += .5;
+                            crimes[6]++;
+                        } else if (crimeType.equals("BURGLARY-RESIDENCE")) {
+                            danger += .5;
+                            crimes[7]++;
+                        } else if (crimeType.equals("ROBBERY-COMMERCIAL")) {
+                            danger += .25;
+                            crimes[8]++;
+                        } else if (crimeType.equals("AUTO THEFT")) {
+                            danger += .25;
+                            crimes[9]++;
+                        } else if (crimeType.equals("BURGLARY-NONRES")) {
+                            danger += .05;
+                            crimes[10]++;
+                        } else if (crimeType.equals("LARCENY-FROM VEHICLE")) {
+                            danger += .05;
+                            crimes[11]++;
+                        }
+                        finish = true;
+                    }
                 }
             }
+            if (year == 2014) {
+                danger /= 6;
+            } else if (year == 2015) {
+                danger /= 4;
+            }
+            danger /= (radius * 60);
+            done = true;
+        } catch (JSONException error) {
+            Log.e("JSON Error", "Error parsing the JSON");
         }
-        if (year == 2014) {
-            danger /= 6;
-        } else if (year == 2015) {
-            danger /= 4;
-        }
-        danger /= (radius * 60);
-        done = true;
     }
 
-    public static void search(String input) {
+    public void search(String input) {
         HttpURLConnection conn = null;
         StringBuilder jsonResults = new StringBuilder();
         try {
@@ -279,35 +500,48 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             sb.append("?sensor=false");
             sb.append("&key=" + API_KEY);
             sb.append("&reference=" + URLEncoder.encode(input, "utf8"));
-            URL url = new URL(sb.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            InputStreamReader in = new InputStreamReader(conn.getInputStream());
-            // Load the results into a StringBuilder
-            int read;
-            char[] buff = new char[1024];
-            while ((read = in.read(buff)) != -1) {
-                jsonResults.append(buff, 0, read);
-            }
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Error processing Places API URL", e);
-            return;
+            String url = sb.toString();
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            Map<String, String> params = new HashMap<>();
+            params.put("sensor", "false");
+            params.put("key", API_KEY);
+            params.put("reference", URLEncoder.encode(input, "utf8"));
+            CustomRequest jsObjRequest = new CustomRequest(Request.Method.POST, url, params, this.searchSuccessResponse(), this.searchErrorResponse());
+
+            requestQueue.add(jsObjRequest);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error connecting to Places API", e);
             return;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
+        }
+
+    }
+
+    public Response.Listener<JSONObject> searchSuccessResponse() {
+        return new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject jsonObj = response;
+                    JSONObject predsJsonArray = jsonObj.getJSONObject("result").getJSONObject("geometry");
+                    JSONObject location = predsJsonArray.getJSONObject("location");
+                    latitude = Double.parseDouble(location.getString("lat"));
+                    longitude = Double.parseDouble(location.getString("lng"));
+                    updateLocation();
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error processing JSON results", e);
+                }
             }
-        }
-        try {
-            JSONObject jsonObj = new JSONObject(jsonResults.toString()).getJSONObject("result");
-            JSONObject predsJsonArray = jsonObj.getJSONObject("geometry");
-            JSONObject location = predsJsonArray.getJSONObject("location");
-            latlong.add(location.getString("lat"));
-            latlong.add(location.getString("lng"));
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error processing JSON results", e);
-        }
+        };
+    }
+
+    public Response.ErrorListener searchErrorResponse() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error", "Error connecting to Places API");
+            }
+        };
+
     }
 
 
@@ -386,8 +620,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
                     if (constraint != null) {
                         // Retrieve the autocomplete results.
                         resultList = autocomplete(constraint.toString());
-
-                        // Assign the data to the FilterResults
+//
+//                        // Assign the data to the FilterResults
                         filterResults.values = resultList.get(0);
                         filterResults.count = resultList.get(0).size();
                     }

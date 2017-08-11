@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SafeSpot</string>
+    <string name="access_token">pk.eyJ1IjoibWljaGFlbC1ha2kiLCJhIjoiY2o0a2Fxc3BnMG95azJ3bDhrNnBwODU4YSJ9.pRBXWswpm884vo6hBl4klA</string>
+
 </resources>
