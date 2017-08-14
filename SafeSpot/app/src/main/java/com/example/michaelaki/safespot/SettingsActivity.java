@@ -21,15 +21,36 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = new Settings();
+        Intent intent = getIntent();
+        if (intent.getStringExtra("MapType") != null) {
+            settings.setMapType(intent.getStringExtra("MapType"));
+            settings.setYear(intent.getIntExtra("Year", 2014));
+        }
         setContentView(R.layout.activity_settings);
         Button done = (Button) findViewById(R.id.doneButton);
         done.setOnClickListener(this);
         Button cancel = (Button) findViewById(R.id.cancelButton);
         cancel.setOnClickListener(this);
-        RadioButton button14 = (RadioButton) findViewById(R.id.checkBox2014);
-        button14.setChecked(true);
-        RadioButton street = (RadioButton) findViewById(R.id.Street);
-        street.setChecked(true);
+        if (settings.getYear() == 2014) {
+            RadioButton button14 = (RadioButton) findViewById(R.id.checkBox2014);
+            button14.setChecked(true);
+        } else if (settings.getYear() == 2015) {
+            RadioButton button15 = (RadioButton) findViewById(R.id.checkBox2015);
+            button15.setChecked(true);
+        } else {
+            RadioButton button16 = (RadioButton) findViewById(R.id.checkBox2016);
+            button16.setChecked(true);
+        }
+        if (settings.getMapType().equals(Style.MAPBOX_STREETS)) {
+            RadioButton street = (RadioButton) findViewById(R.id.Street);
+            street.setChecked(true);
+        } else if (settings.getMapType().equals(Style.SATELLITE)) {
+            RadioButton satellite = (RadioButton) findViewById(R.id.Satellite);
+            satellite.setChecked(true);
+        } else {
+            RadioButton hybrid = (RadioButton) findViewById(R.id.Hybrid);
+            hybrid.setChecked(true);
+        }
     }
 
     @Override

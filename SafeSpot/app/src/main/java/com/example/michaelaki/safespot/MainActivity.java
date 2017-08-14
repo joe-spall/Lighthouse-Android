@@ -264,9 +264,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
-        outState.putDouble("Latitude", latitude);
-        outState.putDouble("Longitude", longitude);
-        outState.putInt("Zoom", zoom);
     }
 
     @Override
@@ -325,6 +322,8 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             });
         } else if (v.getId() == R.id.settingsButton) {
             Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("MapType", settings.getMapType());
+            intent.putExtra("Year", settings.getYear());
             startActivityForResult(intent, 1);
 
         } else if (v.getId() == R.id.cancelButton) {
