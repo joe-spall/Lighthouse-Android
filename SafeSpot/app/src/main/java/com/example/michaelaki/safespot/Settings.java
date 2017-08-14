@@ -12,7 +12,7 @@ public class Settings {
     private String mapType;
     public Settings() {
         year = 2014;
-        radius = 1.0;
+        radius = 0.5;
         mapType = Style.MAPBOX_STREETS;
     }
 

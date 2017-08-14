@@ -7,8 +7,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.constants.Style;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by michaelaki on 8/10/17.
@@ -16,7 +20,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 
 public class SettingsActivity extends Activity implements View.OnClickListener {
     private Settings settings;
-
+    private TextView seekBarValue;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,12 +29,41 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
         if (intent.getStringExtra("MapType") != null) {
             settings.setMapType(intent.getStringExtra("MapType"));
             settings.setYear(intent.getIntExtra("Year", 2014));
+            settings.setRadius(intent.getDoubleExtra("Radius", 0.5));
         }
         setContentView(R.layout.activity_settings);
         Button done = (Button) findViewById(R.id.doneButton);
         done.setOnClickListener(this);
         Button cancel = (Button) findViewById(R.id.cancelButton);
         cancel.setOnClickListener(this);
+        SeekBar seekBar = (SeekBar)findViewById(R.id.radiusBar);
+        seekBar.setProgress((int) (settings.getRadius() * 4) - 2);
+
+        seekBar.setMax(6);
+        seekBarValue = (TextView)findViewById(R.id.radiusText);
+        seekBarValue.setText(Double.toString(settings.getRadius()));
+
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Double value = progress / 4.0 + 0.5;
+                settings.setRadius(value);
+                seekBarValue.setText(String.valueOf(value));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         if (settings.getYear() == 2014) {
             RadioButton button14 = (RadioButton) findViewById(R.id.checkBox2014);
             button14.setChecked(true);
@@ -79,6 +112,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("Year", year);
             intent.putExtra("MapType", mapType);
+            intent.putExtra("Radius", settings.getRadius());
             setResult(1, intent);
             finish();
         } else {

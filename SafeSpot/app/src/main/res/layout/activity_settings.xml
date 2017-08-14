@@ -37,11 +37,16 @@
     </RadioGroup>
 
     <SeekBar
-        android:id="@+id/seekBar"
+        android:id="@+id/radiusBar"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/radiusLabel"/>
+
+    <TextView
+        android:id="@+id/radiusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        app:layout_constraintTop_toBottomOf="@+id/radiusLabel"/>
+        app:layout_constraintTop_toBottomOf="@id/radiusBar"/>
 
     <Button
         android:id="@+id/cancelButton"
@@ -80,7 +85,7 @@
         android:textColor="#000000"
         android:textSize="25sp"
         app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+        app:layout_constraintTop_toBottomOf="@+id/radiusText" />
 
     <TextView
         android:id="@+id/radiusLabel"

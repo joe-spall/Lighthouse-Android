@@ -44,7 +44,7 @@
         android:layout_marginLeft="3dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintBottom_toTopOf="@+id/mapview"
-        app:layout_constraintLeft_toRightOf="@+id/directions" />
+        app:layout_constraintLeft_toRightOf="@+id/search" />
 
     <ImageButton
         android:id="@+id/currentLocation"
@@ -58,13 +58,25 @@
         android:layout_marginLeft="8dp" />
 
     <ImageButton
-        android:id="@+id/directions"
+        android:id="@+id/search"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:src="@android:drawable/ic_menu_directions"
+        android:src="@android:drawable/ic_menu_search"
         app:layout_constraintBottom_toTopOf="@+id/mapview"
         app:layout_constraintLeft_toRightOf="@+id/autoCompleteTextView"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="3dp"/>
+
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
