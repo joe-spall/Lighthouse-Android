@@ -94,10 +94,26 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     private static double radius;
     private MapView mapView;
     private Settings settings;
+    private int zoom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+            zoom = 14;
+            final LocationSource locationSource = new LocationSource(this);
+            Location location = null;
+            locationSource.activate();
+            try {
+                location = locationSource.getLastLocation();
+                if (location != null) {
+
+
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                }
+            } catch (SecurityException e) {
+                Log.e("Not given permission", "Request Permission from the user"); // lets the user know there is a problem with the gps
+            }
 
         Mapbox.getInstance(this, getString(R.string.access_token));
         //creates instance of mapbox
@@ -114,20 +130,13 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
         mapView = (MapView) findViewById(R.id.mapview);
         //gets elements on screen and sets up click listeners
 
-        if (settings == null) {
-            settings = new Settings();
-        }
-        Intent intent = getIntent();
-        if (intent.getStringExtra("MapType") != null) {
-            settings.setYear(intent.getIntExtra("Year", 2014));
-            settings.setMapType(intent.getStringExtra("MapType"));
-        }
+        settings = new Settings();
 
 
         mapView.onCreate(savedInstanceState);
         mapView.setStyleUrl(settings.getMapType());
 
-        final LocationSource locationSource = new LocationSource(this);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Check Permissions Now
@@ -140,16 +149,10 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
                 @Override
                 public void onMapReady(MapboxMap mapboxMap) {
                     mapboxMap.setMyLocationEnabled(true);
-                    Location location = null;
-                    locationSource.activate();
-                    try {
-                        location = locationSource.getLastLocation();
-                    } catch (SecurityException e) {
-                        Log.e("Not given permission", "Request Permission from the user"); // lets the user know there is a problem with the gps
-                    }
+
                     final CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(location.getLatitude(), location.getLongitude())) // Sets the center of the map to Chicago
-                            .zoom(11)                            // Sets the zoom
+                            .target(new LatLng(latitude, longitude)) // Sets the center of the map to location
+                            .zoom(zoom)                            // Sets the zoom
                             .build();
                     mapboxMap.setCameraPosition(cameraPosition);
                     // Interact with the map using mapboxMap here
@@ -163,15 +166,17 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     }
 
     public void updateLocation() {
+        mapView.setStyleUrl(settings.getMapType());
         final LocationSource locationSource = new LocationSource(this);
         // We can now safely use the API we requested access to
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 mapboxMap.setMyLocationEnabled(true);
+                zoom = 16;
                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(latitude, longitude))
-                        .zoom(16)                            // Sets the zoom
+                        .zoom(zoom)                            // Sets the zoom
                         .build();
                 mapboxMap.setCameraPosition(cameraPosition);
                 // Interact with the map using mapboxMap here
@@ -204,7 +209,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
                         }
                         final CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(location.getLatitude(), location.getLongitude())) // Sets the center of the map to current location
-                                .zoom(11)                            // Sets the zoom
+                                .zoom(zoom)                            // Sets the zoom
                                 .build();
                         mapboxMap.setCameraPosition(cameraPosition);
                         // Interact with the map using mapboxMap here
@@ -259,6 +264,15 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
+        outState.putDouble("Latitude", latitude);
+        outState.putDouble("Longitude", longitude);
+        outState.putInt("Zoom", zoom);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
     }
 
     @Override
@@ -311,7 +325,7 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
             });
         } else if (v.getId() == R.id.settingsButton) {
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
 
         } else if (v.getId() == R.id.cancelButton) {
             setContentView(R.layout.activity_main);
@@ -391,6 +405,22 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
 
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        // Check which request we're responding to
+        if (requestCode == 1) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK || resultCode == RESULT_FIRST_USER) {
+                if (intent.getStringExtra("MapType") != null) {
+                    settings.setYear(intent.getIntExtra("Year", 2014));
+                    settings.setMapType(intent.getStringExtra("MapType"));
+                }
+                updateLocation();
+                // Do something with the contact here (bigger example below)
+            }
+        }
     }
 
     public void calculateDanger(JSONObject response) {
@@ -491,8 +521,6 @@ public class MainActivity extends Activity implements OnItemClickListener, OnCli
     }
 
     public void search(String input) {
-        HttpURLConnection conn = null;
-        StringBuilder jsonResults = new StringBuilder();
         try {
             StringBuilder sb = new StringBuilder(PLACES_API_BASE);
             sb.append(TYPE_FIND);

@@ -58,6 +58,11 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("Year", year);
             intent.putExtra("MapType", mapType);
+            setResult(1, intent);
+            finish();
+        } else {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
     }
