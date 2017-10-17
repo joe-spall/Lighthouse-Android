@@ -1,6 +1,7 @@
-package com.example.michaelaki.safespot;
+package com.example.michaelaki.lighthouseandroid.model;
 
-import com.mapbox.mapboxsdk.constants.Style;
+
+import com.google.android.gms.maps.GoogleMap;
 
 import java.io.Serializable;
 
@@ -11,14 +12,14 @@ import java.io.Serializable;
 public class Settings implements Serializable{
     private int year;
     private double radius;
-    private String mapType;
+    private int mapType;
     private String crimeTime;
     private CrimeWeightSettings crimeWeights;
 
     public Settings() {
         year = 2014;
         radius = 0.5;
-        mapType = Style.MAPBOX_STREETS;
+        mapType = GoogleMap.MAP_TYPE_NORMAL;
         crimeWeights = new CrimeWeightSettings();
         crimeTime = "MAN";
     }
@@ -47,11 +48,11 @@ public class Settings implements Serializable{
         return radius;
     }
 
-    public void setMapType(String mapType) {
+    public void setMapType(int mapType) {
         this.mapType = mapType;
     }
 
-    public String getMapType() {
+    public int getMapType() {
         return mapType;
     }
 

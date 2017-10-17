@@ -1,4 +1,4 @@
-package com.example.michaelaki.safespot;
+package com.example.michaelaki.lighthouseandroid.controller;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,8 +9,10 @@ import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.michaelaki.safespot.CrimeWeightSettings;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.example.michaelaki.lighthouseandroid.model.CrimeWeightSettings;
+import com.example.michaelaki.lighthouseandroid.R;
+import com.example.michaelaki.lighthouseandroid.model.Settings;
+import com.google.android.gms.maps.GoogleMap;
 
 /**
  * Created by michaelaki on 8/10/17.
@@ -19,6 +21,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 public class SettingsActivity extends Activity implements View.OnClickListener {
     private Settings settings;
     private TextView seekBarValue;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,10 +76,10 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
             RadioButton button16 = (RadioButton) findViewById(R.id.checkBox2016);
             button16.setChecked(true);
         }
-        if (settings.getMapType().equals(Style.MAPBOX_STREETS)) {
+        if (settings.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
             RadioButton street = (RadioButton) findViewById(R.id.Street);
             street.setChecked(true);
-        } else if (settings.getMapType().equals(Style.SATELLITE)) {
+        } else if (settings.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
             RadioButton satellite = (RadioButton) findViewById(R.id.Satellite);
             satellite.setChecked(true);
         } else {
@@ -101,13 +104,13 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
             RadioButton street = (RadioButton) findViewById(R.id.Street);
             RadioButton satellite = (RadioButton) findViewById(R.id.Satellite);
             RadioButton hybrid = (RadioButton) findViewById(R.id.Hybrid);
-            String mapType = "";
+            int mapType = 0;
             if (street.isChecked()) {
-                mapType = Style.MAPBOX_STREETS;
+                mapType = GoogleMap.MAP_TYPE_NORMAL;
             } else if (satellite.isChecked()) {
-                mapType = Style.SATELLITE;
+                mapType = GoogleMap.MAP_TYPE_SATELLITE;
             } else if (hybrid.isChecked()) {
-                mapType = Style.SATELLITE_STREETS;
+                mapType = GoogleMap.MAP_TYPE_HYBRID;
             }
             settings.setMapType(mapType);
             Intent intent = new Intent(this, MainActivity.class);

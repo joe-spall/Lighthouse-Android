@@ -1,7 +1,6 @@
 package com.example.michaelaki.safespot;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,24 +20,26 @@ public class DetailActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scores);
 
-        Button backButton = (Button) findViewById(R.id.backButton);
-        backButton.setOnClickListener(this);
 
         Intent intent = getIntent();
         Double danger = intent.getDoubleExtra("Danger", 0.0);
         String title = intent.getStringExtra("Address");
         int[] crimes = intent.getIntArrayExtra("CrimeArray");
+        //get details sent in through the intent
 
+        Button backButton = (Button) findViewById(R.id.backButton);
+        backButton.setOnClickListener(this);
         TextView dangerScore = (TextView) findViewById(R.id.textView2);
         TextView crimeText = (TextView) findViewById(R.id.textView5);
         TextView details = (TextView) findViewById(R.id.textView6);
+        //initializes view widgets
 
         DecimalFormat df = new DecimalFormat("####0.00");
 
         dangerScore.setText("Danger Score\n" + df.format(danger));
         dangerScore.setTextColor(Color.rgb((int) (danger * 50), 0, 0));
         details.setText("Crimes for " + title);
-        crimeText.setText("Homicides: " + crimes[0] + "\nAggregated Assault: " + crimes[1]
+        crimeText.setText("Homicide: " + crimes[0] + "\nAggregated Assault: " + crimes[1]
                 + "\nRape: " + crimes[2] + "\nRobbery: " + crimes[3]
                 + "\nNon Vehicular Larceny: "
                 + crimes[4] + "\nVehicle Burglary: " + crimes[5]
@@ -52,6 +53,7 @@ public class DetailActivity extends Activity implements View.OnClickListener{
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
+            //returns the user back to the map view
         }
     }
 }

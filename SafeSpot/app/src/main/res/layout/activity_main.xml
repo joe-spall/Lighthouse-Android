@@ -44,18 +44,19 @@
         android:layout_marginLeft="3dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintBottom_toTopOf="@+id/mapview"
-        app:layout_constraintLeft_toRightOf="@+id/search" />
+        app:layout_constraintLeft_toRightOf="@+id/search"
+        android:layout_marginStart="3dp" />
 
     <ImageButton
         android:id="@+id/currentLocation"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:src="@drawable/mapbox_mylocation_icon_bearing"
-        tools:layout_editor_absoluteY="58dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="8dp" />
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp" />
 
     <ImageButton
         android:id="@+id/search"
@@ -65,13 +66,16 @@
         app:layout_constraintBottom_toTopOf="@+id/mapview"
         app:layout_constraintLeft_toRightOf="@+id/autoCompleteTextView"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="3dp"/>
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp" />
 
     <RelativeLayout
         android:id="@+id/loadingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center" >
+        android:layout_width="0dp"
+        android:layout_height="37dp"
+        android:gravity="center"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp">
 
         <ProgressBar
             android:layout_width="wrap_content"

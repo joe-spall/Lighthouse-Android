@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crime Weights"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/homicideText"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text="Homicide"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleText" />
+
+    <SeekBar
+        android:id="@+id/homicideSlider"
+        android:layout_width="200sp"
+        android:layout_height="30sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/homicideText"
+        tools:layout_editor_absoluteX="87dp"
+        tools:layout_editor_absoluteY="49dp" />
+
+    <TextView
+        android:id="@+id/homicideWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/homicideSlider"
+        app:layout_constraintTop_toBottomOf="@id/homicideText" />
+
+    <TextView
+        android:id="@+id/assaultText"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text="Assault"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/homicideSlider" />
+
+    <SeekBar
+        android:id="@+id/assaultSlider"
+        android:layout_width="200sp"
+        android:layout_height="30sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/assaultText"
+        tools:layout_editor_absoluteX="87dp"
+        tools:layout_editor_absoluteY="49dp" />
+
+    <TextView
+        android:id="@+id/assaultWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/assaultSlider"
+        app:layout_constraintTop_toBottomOf="@id/assaultText" />
+
+    <TextView
+        android:id="@+id/rapeText"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text="Rape"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/assaultSlider" />
+
+    <SeekBar
+        android:id="@+id/rapeSlider"
+        android:layout_width="200sp"
+        android:layout_height="30sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rapeText"
+        tools:layout_editor_absoluteX="87dp"
+        tools:layout_editor_absoluteY="49dp" />
+
+    <TextView
+        android:id="@+id/rapeWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/rapeSlider"
+        app:layout_constraintTop_toBottomOf="@id/rapeText" />
+
+    <TextView
+        android:id="@+id/pedestrianTheftText"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text="Pedestrian Theft"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rapeSlider" />
+
+    <SeekBar
+        android:id="@+id/pedestrianTheftSlider"
+        android:layout_width="200sp"
+        android:layout_height="30sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pedestrianTheftText"
+        tools:layout_editor_absoluteX="87dp"
+        tools:layout_editor_absoluteY="49dp" />
+
+    <TextView
+        android:id="@+id/pedestrianTheftWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/pedestrianTheftSlider"
+        app:layout_constraintTop_toBottomOf="@id/pedestrianTheftText" />
+
+    <TextView
+        android:id="@+id/vehicularTheftText"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text="Vehicular Theft"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pedestrianTheftSlider" />
+
+    <SeekBar
+        android:id="@+id/vehicularTheftSlider"
+        android:layout_width="200sp"
+        android:layout_height="30sp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vehicularTheftText"
+        tools:layout_editor_absoluteX="87dp"
+        tools:layout_editor_absoluteY="49dp" />
+
+    <TextView
+        android:id="@+id/vehicularTheftWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/vehicularTheftSlider"
+        app:layout_constraintTop_toBottomOf="@id/vehicularTheftText" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="191dp"
+        android:layout_height="50dp"
+        android:text="Cancel"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/doneButton"
+        android:layout_width="191dp"
+        android:layout_height="50dp"
+        android:text="Done"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/cancelButton" />
+
+</android.support.constraint.ConstraintLayout>
