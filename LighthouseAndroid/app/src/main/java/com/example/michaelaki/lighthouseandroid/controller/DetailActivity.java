@@ -1,4 +1,4 @@
-package com.example.michaelaki.safespot;
+package com.example.michaelaki.lighthouseandroid.controller;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.michaelaki.lighthouseandroid.R;
 
 import java.text.DecimalFormat;
 
@@ -23,7 +25,7 @@ public class DetailActivity extends Activity implements View.OnClickListener{
 
         Intent intent = getIntent();
         Double danger = intent.getDoubleExtra("Danger", 0.0);
-        String title = intent.getStringExtra("Address");
+
         int[] crimes = intent.getIntArrayExtra("CrimeArray");
         //get details sent in through the intent
 
@@ -38,7 +40,7 @@ public class DetailActivity extends Activity implements View.OnClickListener{
 
         dangerScore.setText("Danger Score\n" + df.format(danger));
         dangerScore.setTextColor(Color.rgb((int) (danger * 50), 0, 0));
-        details.setText("Crimes for " + title);
+        details.setText("Crimes for this area");
         crimeText.setText("Homicide: " + crimes[0] + "\nAggregated Assault: " + crimes[1]
                 + "\nRape: " + crimes[2] + "\nRobbery: " + crimes[3]
                 + "\nNon Vehicular Larceny: "

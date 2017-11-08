@@ -47,6 +47,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".controller.MainActivity" />
         </activity>
+        <activity android:name=".controller.DetailActivity"
+            android:parentActivityName=".controller.MainActivity" >
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controller.MainActivity" />
+        </activity>
         <activity android:name=".controller.CrimeWeightSettingsActivity"
             android:parentActivityName="com.example.michaelaki.lighthouseandroid.controller.SettingsActivity" >
             <!-- The meta-data tag is required if you support API level 15 and lower -->
