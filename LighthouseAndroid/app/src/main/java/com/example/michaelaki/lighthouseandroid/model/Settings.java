@@ -11,14 +11,14 @@ import java.io.Serializable;
 
 public class Settings implements Serializable{
     private int year;
-    private double radius;
+    private int radius;
     private int mapType;
     private String crimeTime;
     private CrimeWeightSettings crimeWeights;
 
     public Settings() {
         year = 2014;
-        radius = 0.5;
+        radius = 150;
         mapType = GoogleMap.MAP_TYPE_NORMAL;
         crimeWeights = new CrimeWeightSettings();
         crimeTime = "MAN";
@@ -40,11 +40,11 @@ public class Settings implements Serializable{
         return year;
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(int radius) {
         this.radius = radius;
     }
 
-    public double getRadius() {
+    public int getRadius() {
         return radius;
     }
 

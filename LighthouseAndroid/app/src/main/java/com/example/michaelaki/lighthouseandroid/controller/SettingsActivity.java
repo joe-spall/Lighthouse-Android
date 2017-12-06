@@ -4,15 +4,19 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.michaelaki.lighthouseandroid.model.CrimeWeightSettings;
 import com.example.michaelaki.lighthouseandroid.R;
 import com.example.michaelaki.lighthouseandroid.model.Settings;
 import com.google.android.gms.maps.GoogleMap;
+
+import java.util.ArrayList;
 
 /**
  * Created by michaelaki on 8/10/17.
@@ -39,18 +43,18 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
         crimeWeights.setOnClickListener(this);
         cancel.setOnClickListener(this);
         SeekBar seekBar = (SeekBar)findViewById(R.id.radiusBar);
-        seekBar.setProgress((int) (settings.getRadius() * 4) - 2);
+        seekBar.setProgress(settings.getRadius()/50 - 1);
 
-        seekBar.setMax(6);
+        seekBar.setMax(4);
         seekBarValue = (TextView)findViewById(R.id.radiusText);
-        seekBarValue.setText(Double.toString(settings.getRadius()));
+        seekBarValue.setText(Integer.toString(settings.getRadius()));
 
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Double value = progress / 4.0 + 0.5;
+                int value = progress * 50 + 50;
                 settings.setRadius(value);
                 seekBarValue.setText(String.valueOf(value));
             }
@@ -65,17 +69,15 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
 
             }
         });
-
-        if (settings.getYear() == 2014) {
-            RadioButton button14 = (RadioButton) findViewById(R.id.checkBox2014);
-            button14.setChecked(true);
-        } else if (settings.getYear() == 2015) {
-            RadioButton button15 = (RadioButton) findViewById(R.id.checkBox2015);
-            button15.setChecked(true);
-        } else {
-            RadioButton button16 = (RadioButton) findViewById(R.id.checkBox2016);
-            button16.setChecked(true);
+        Spinner spinner = (Spinner) findViewById(R.id.yearSpinner);
+        ArrayList<Integer> years = new ArrayList<>();
+        for (int k = 2008; k <= 2017; k++) {
+            years.add(k);
         }
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years);
+        spinner.setAdapter(adapter);
+        int spinnerPosition = adapter.getPosition(settings.getYear());
+        spinner.setSelection(spinnerPosition);
         if (settings.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
             RadioButton street = (RadioButton) findViewById(R.id.Street);
             street.setChecked(true);
@@ -91,15 +93,10 @@ public class SettingsActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.doneButton) {
-            RadioButton button14 = (RadioButton) findViewById(R.id.checkBox2014);
-            RadioButton button15 = (RadioButton) findViewById(R.id.checkBox2015);
-            RadioButton button16 = (RadioButton) findViewById(R.id.checkBox2016);
-            int year = 2016;
-            if (button14.isChecked()) {
-                year = 2014;
-            } else if (button15.isChecked()) {
-                year = 2015;
-            }
+
+            Spinner spinner = (Spinner) findViewById(R.id.yearSpinner);
+            int year = Integer.parseInt(spinner.getSelectedItem().toString());
+
             settings.setYear(year);
             RadioButton street = (RadioButton) findViewById(R.id.Street);
             RadioButton satellite = (RadioButton) findViewById(R.id.Satellite);

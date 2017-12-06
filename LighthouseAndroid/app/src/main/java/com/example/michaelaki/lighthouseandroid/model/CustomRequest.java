@@ -8,6 +8,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,20 +20,20 @@ import java.util.Map;
  */
 
 
-public class CustomRequest extends Request<JSONObject> {
+public class CustomRequest extends Request<JSONArray> {
 
-    private Listener<JSONObject> listener;
+    private Listener<JSONArray> listener;
     private Map<String, String> params;
 
     public CustomRequest(String url, Map<String, String> params,
-                         Listener<JSONObject> reponseListener, ErrorListener errorListener) {
+                         Listener<JSONArray> reponseListener, ErrorListener errorListener) {
         super(Method.GET, url, errorListener);
         this.listener = reponseListener;
         this.params = params;
     }
 
     public CustomRequest(int method, String url, Map<String, String> params,
-                         Listener<JSONObject> reponseListener, ErrorListener errorListener) {
+                         Listener<JSONArray> reponseListener, ErrorListener errorListener) {
         super(method, url, errorListener);
         this.listener = reponseListener;
         this.params = params;
@@ -44,12 +45,16 @@ public class CustomRequest extends Request<JSONObject> {
     };
 
     @Override
-    protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+    protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
         try {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
-            return Response.success(new JSONObject(jsonString),
+            System.out.println(jsonString);
+            Response<JSONArray> answer = Response.success(new JSONArray(jsonString),
                     HttpHeaderParser.parseCacheHeaders(response));
+
+
+            return answer;
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException je) {
@@ -58,7 +63,7 @@ public class CustomRequest extends Request<JSONObject> {
     }
 
     @Override
-    protected void deliverResponse(JSONObject response) {
+    protected void deliverResponse(JSONArray response) {
         // TODO Auto-generated method stub
         listener.onResponse(response);
     }

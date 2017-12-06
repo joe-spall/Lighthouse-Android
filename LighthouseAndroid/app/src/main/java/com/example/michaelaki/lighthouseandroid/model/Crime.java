@@ -35,4 +35,6 @@ public class Crime implements ClusterItem {
     public String getSnippet() {
         return date;
     }
+
+
 }

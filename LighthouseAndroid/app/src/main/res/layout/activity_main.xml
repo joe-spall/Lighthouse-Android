@@ -14,49 +14,43 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView" />
+        app:layout_constraintTop_toBottomOf="parent" />
+
 
     <AutoCompleteTextView
+
         android:id="@+id/autoCompleteTextView"
-        android:layout_width="268dp"
-        android:layout_height="45dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:layout_gravity="start"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="2dp"
-        android:background="@color/common_google_signin_btn_text_dark_pressed"
-        android:hint="Type in your location"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.058"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="5dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="50dp"
+        android:background="@drawable/common_google_signin_btn_text_light_normal"
+        android:hint="Type in your location"
+        android:layout_marginEnd="50dp" />
 
-    <ImageButton
-        android:id="@+id/settingsButton"
-        android:layout_width="46dp"
-        android:layout_height="46dp"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="parent"
-        android:src="@mipmap/ic_launcher"
-        />
-
-    <ImageButton
+    <Button
         android:id="@+id/searchButton"
-        android:layout_width="46dp"
-        android:layout_height="46dp"
-        app:srcCompat="@android:drawable/ic_search_category_default"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/autoCompleteTextView"
-        app:layout_constraintRight_toLeftOf="@+id/directionButton" />
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/round_button"
+        android:src="@android:drawable/ic_search_category_default"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="60dp"
+        android:text="2.0"
+
+        android:layout_marginEnd="10dp" />
+
+
+
 
     <RelativeLayout
         android:id="@+id/loadingPanel"
-        android:layout_width="0dp"
+        android:layout_width="37dp"
         android:layout_height="37dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -70,13 +64,144 @@
             android:indeterminate="true" />
     </RelativeLayout>
 
+
+
     <ImageButton
-        android:id="@+id/directionButton"
-        android:layout_width="46dp"
-        android:layout_height="46dp"
-        app:srcCompat="@android:drawable/ic_menu_directions"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/searchButton"
-        app:layout_constraintRight_toLeftOf="@id/settingsButton"/>
+        android:id="@+id/upButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/round_button"
+        android:onClick="slideUpDown"
+        android:src="@mipmap/ic_lighthouse_icon" />
+
+    <RelativeLayout
+        android:id="@+id/hidden_panel"
+        android:layout_width="395dp"
+        android:layout_height="195dp"
+        android:background="@drawable/layout_bg"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent">
+
+        <ImageButton
+            android:id="@+id/downButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/round_button"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:onClick="slideUpDown"
+            android:src="@mipmap/ic_lighthouse_icon" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+
+            android:layout_below="@id/downButton"
+            android:background="@drawable/ic_settings"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            />
+
+        <TextView
+            android:id="@+id/safeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginBottom="10dp"
+            android:text="Safe"
+            android:layout_below="@+id/keyImage"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"/>
+
+
+
+        <ImageView
+            android:id="@+id/keyImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/downButton"
+            android:src="@drawable/color_key" />
+
+        <TextView
+            android:id="@+id/dangerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:paddingLeft="250dp"
+            android:layout_below="@id/keyImage"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="Dangerous"/>
+
+
+        <ImageButton
+            android:id="@+id/homicideButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_homicide"
+            android:background="@drawable/layout_bg_blue"
+            android:onClick="toggleHomicide"
+            android:layout_below="@id/safeText"
+            />
+        <ImageButton
+            android:id="@+id/assaultButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_assault"
+            android:background="@drawable/layout_bg_blue"
+            android:onClick="toggleAssault"
+            android:layout_toRightOf="@+id/homicideButton"
+            android:layout_below="@id/safeText"
+            />
+        <ImageButton
+            android:id="@+id/rapeButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_rape"
+            android:background="@drawable/layout_bg_blue"
+            android:onClick="toggleRape"
+            android:layout_toRightOf="@+id/assaultButton"
+            android:layout_below="@id/safeText"
+            />
+        <ImageButton
+            android:id="@+id/pedestrianTheftButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_ped_theft"
+            android:background="@drawable/layout_bg_blue"
+            android:onClick="togglePedTheft"
+            android:layout_toRightOf="@+id/rapeButton"
+            android:layout_below="@id/safeText"
+            />
+        <ImageButton
+            android:id="@+id/autoTheftButton"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_car_theft"
+            android:background="@drawable/layout_bg_blue"
+            android:onClick="toggleCarTheft"
+            android:layout_toRightOf="@+id/pedestrianTheftButton"
+            android:layout_below="@id/safeText"
+            />
+
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
+

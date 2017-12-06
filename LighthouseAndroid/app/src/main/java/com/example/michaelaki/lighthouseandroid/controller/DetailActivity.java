@@ -41,7 +41,7 @@ public class DetailActivity extends Activity implements View.OnClickListener{
         dangerScore.setText("Danger Score\n" + df.format(danger));
         dangerScore.setTextColor(Color.rgb((int) (danger * 50), 0, 0));
         details.setText("Crimes for this area");
-        crimeText.setText("Homicide: " + crimes[0] + "\nAggregated Assault: " + crimes[1]
+        crimeText.setText("Homicide: " + crimes[0] + "\nAggravated Assault: " + crimes[1]
                 + "\nRape: " + crimes[2] + "\nRobbery: " + crimes[3]
                 + "\nNon Vehicular Larceny: "
                 + crimes[4] + "\nVehicle Burglary: " + crimes[5]
